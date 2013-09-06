@@ -236,7 +236,7 @@ def printStats(testStats, regexParse):
 #Test the data on randomly selected subsets of fullDataPoints, returns the array of averaged stats that are of the 
 #same format as the one returned by test
 def randomlyTest(timesRun, stats, fullDataPoints):
-	totalAccuracy = []
+	totalAccuracy = [0, 0, 0]
 
 	#Test the data on randmoly selected subsets timesRun times
 	for i in xrange(0,timesRun):
@@ -251,7 +251,9 @@ def randomlyTest(timesRun, stats, fullDataPoints):
 
 		#Test the model on the same dataPoints
 		testStats = test(testDataPoints, stats, vocab, regexParse)
-		totalAccuracy+=testStats
+		totalAccuracy[0]+=testStats[0]
+		totalAccuracy[1]+=testStats[1]
+		totalAccuracy[2]+=testStats[2]
 
 	return [x/timesRun for x in totalAccuracy]
 
