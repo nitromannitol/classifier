@@ -229,12 +229,39 @@ def printStats(testStats, regexParse):
 	else:
 		print "Parsing by: ", regexParse
 	print "Accuracy: ", testStats[0]*100, "%"
+	total = testStats[1] + testStats[2]
 	print "Classifier predicted: ", (float(testStats[1])/total)*100, "%", "product bugs and ", (testStats[2]/total)*100, "%",  "automation bugs"
+
+
+#Test the data on randomly selected subsets of fullDataPoints, returns the array of averaged stats that are of the 
+#same format as the one returned by test
+def randomlyTest(timesRun, stats, fullDataPoints):
+	totalAccuracy = []
+
+	#Test the data on randmoly selected subsets timesRun times
+	for i in xrange(0,timesRun):
+
+		testDataPoints = []
+
+		while(len(testDataPoints) <=5): ##Ensure that we test at least 5 data points
+			randomStart = random.randint(0,len(fullDataPoints)/2)
+			randomEnd = random.randint(randomStart,len(fullDataPoints))
+			testDataPoints = fullDataPoints[randomStart:randomEnd]
+
+
+		#Test the model on the same dataPoints
+		testStats = test(testDataPoints, stats, vocab, regexParse)
+		totalAccuracy+=testStats
+
+	return [x/timesRun for x in totalAccuracy]
 
 ######################################################################################################################################
 
 directory = raw_input("What directory are the XML files located:\n")
 regexParse = raw_input("How would you like to parse the words, leave it blank if you would like to parse by whitespace:\n")
+timesRun = int(raw_input("How many times would you like to run the test:\n"))
+while(timesRun <= 0):
+	timesRun = int(raw_input("Please enter an integer greater than 0:\n"))
 
 if(regexParse == ""):
 	regexParse = None
@@ -252,12 +279,10 @@ total = len(fullDataPoints)
 #Collect the statistics, i.e., train the model on the dataset provided
 stats = train(fullDataPoints, regexParse)
 
-#Test the model on the same dataPoints
-testStats = test(fullDataPoints, stats, vocab, regexParse)
+averageAccuracy = randomlyTest(timesRun,stats,fullDataPoints)
 
 #Print out the test statistics 
-printStats(testStats, regexParse) 
-
+printStats(averageAccuracy, regexParse) 
 
 
 
