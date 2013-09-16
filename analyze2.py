@@ -1,5 +1,7 @@
 import numpy as np
 import mlpy
+import os, os.path,sys,re
+
 
 ### Helper functions ###
 
@@ -13,7 +15,6 @@ def extract(feature, text):
 
 
 def parseDataPoints(directory,regexParse):
-
 #Dictionaries mapping feature/word to index in vocab and index to feature/word
 	vocab = {}
 	indexToWord = {}
@@ -35,6 +36,7 @@ def parseDataPoints(directory,regexParse):
 					if word not in vocab:
 				 		vocab[word] = len(vocab)
 				 		indexToWord[len(vocab)-1] = word
+	return [vocab, indexToWord, dataPoints]
 
 
 
@@ -43,20 +45,21 @@ def parseDataPoints(directory,regexParse):
 #Y is a vector n which represents the target values (integers in classification problems, 1 product error, 0 automation error)
 #Data is the data which is returned from parseDataPoints
 
-def packageData(fullData,regexParse,vocab):
-	X = []
+def packageData(fullData,regexParse,vocab, indexToWord):
+	X = [ [0 for z in range(len(vocab) + 1)   ] for j in range(len(fullData))]
 	Y = []
+	count = 0
 	for data in fullData:
 		[typ, duration, stack, message] = data
-		dataPoint = []
-		dataPoint.append(float(duration))
+		#dataPoint = [1*(len(vocab)+1) for j in range(len(vocab) +1)]
+		X[count][0] = float(duration)
 		for word in stack.split(regexParse) + message.split(regexParse):
-			dataPoint.append(vocab[word])
-		X.append(dataPoint)
+			X[count][vocab[word]+1]+=1
 		if typ == "true":
 			Y.append(1)
 		if typ =="false":
 			Y.append(0)
+		count+=1
 
 	return [X,Y]
 
@@ -75,12 +78,19 @@ def printAccuracy(pred_labels, actual_label, model_type):
 
 directory = raw_input("What directory are the XML files located:\n")
 regexParse = raw_input("How would you like to parse the words, leave it blank if you would like to parse by whitespace:\n")
-model_type = LDAC
+model_type = "LDAC"
 if(regexParse == ""):
 	regexParse = None
 [vocab,indexToWord,fullDataPoints] = parseDataPoints(directory,regexParse)
-[X,Y] = packageData(fullDataPoints,regexParse,vocab)
-print len(X), len(X[0]), len(Y)
+[X,Y] = packageData(fullDataPoints,regexParse,vocab, indexToWord)
+#print len(X), len(Y)
+#for x in X:
+#	print len(x)
+
+print X[0], fullDataPoints[0][3]
+
+X = np.array(X)
+Y = np.array(Y)
 
 ldac = mlpy.LDAC()
 ldac.learn(X,Y)
