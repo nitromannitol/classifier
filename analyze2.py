@@ -46,7 +46,7 @@ def parseDataPoints(directory,regexParse):
 #Data is the data which is returned from parseDataPoints
 
 def packageData(fullData,regexParse,vocab, indexToWord):
-	X = [ [1 for z in range(len(vocab) + 1)   ] for j in range(len(fullData))]
+	X = [ [0.1 for z in range(len(vocab) + 1)   ] for j in range(len(fullData))]
 	Y = []
 	count = 0
 	for data in fullData:
@@ -75,6 +75,24 @@ def printAccuracy(pred_labels, actual_label, model_type):
 
 
 
+#Divides the dataset into pieces determined by the divideMarker
+def divide(X,Y, divideMarker):
+	divide = int(float(len(X))*divideMarker)
+	return X[:divide], X[divide:], Y[:divide], Y[divide:]
+
+
+
+#Tests the model without bias
+def testModel(model, X, Y, modelName):
+	[xTrain, xTest, yTrain, yTest] = divide(X, Y, 0.1)
+	try:
+		model.learn(xTrain, yTrain)
+		printAccuracy(model.pred(xTest),yTest, modelName)
+	except:
+		print "Error in", modelName
+
+
+
 
 directory = raw_input("What directory are the XML files located:\n")
 regexParse = raw_input("How would you like to parse the words, leave it blank if you would like to parse by whitespace:\n")
@@ -82,58 +100,20 @@ if(regexParse == ""):
 	regexParse = None
 [vocab,indexToWord,fullDataPoints] = parseDataPoints(directory,regexParse)
 [X,Y] = packageData(fullDataPoints,regexParse,vocab, indexToWord)
-#print len(X), len(Y)
-#for x in X:
-#	print len(x)
-
-#print X[0], fullDataPoints[0][3]
-#print len(X),len(Y)
-#for x in X:
-#	print len(x)
 
 
-try:
-	p = mlpy.Perceptron(alpha=0.1, thr=0.05, maxiters=1000)
-	p.learn(X,Y)
-	Y_PRED = p.pred(X)
-	printAccuracy(Y_PRED, Y, "Basic Perceptron")
-except: 
-	print "Error in BP"
-
-
-try:
-	en = mlpy.ElasticNetC(lmb=0.01, eps=0.001)
-	en.learn(X, Y)
-	Y_PRED = en.pred(X)
-	printAccuracy(Y_PRED,Y,"Elastic Net Classifer")
-except:
-	print "Error in ENC"
+testModel(mlpy.Perceptron(alpha=0.1, thr=0.05, maxiters=1000), X, Y, "Perceptron")
+testModel(mlpy.ElasticNetC(lmb=0.01, eps=0.001),X,Y, "ElasticNet")
+testModel(mlpy.LibLinear(solver_type='l2r_l2loss_svc_dual', C=1), X, Y, "LibLinear")
+testModel(mlpy.DLDA(delta=0.1), X, Y, "DLDA")
+testModel(mlpy.Golub(), X, Y, "Golub")
+testModel(mlpy.Parzen(),X,Y,"Parzen")
+testModel(mlpy.KNN(2),X,Y,"KNN")
+testModel(mlpy.ClassTree(),X,Y,"Classification Tree")
+testModel(mlpy.MaximumLikelihoodC(),X,Y,"Maximum Likelihood Classifer")
 
 
 
-try:
-	svm = mlpy.LibLinear(solver_type='l2r_l2loss_svc_dual', C=1)
-	svm.learn(X,Y)
-	Y_PRED = svm.pred(X)
-	printAccuracy(Y_PRED,Y,"Support Vector Machine")
-except:
-	print "Error in SVM"
-
-try:
-	da = mlpy.DLDA(delta=0.1)
-	da.learn(X, Y)
-	Y_PRED = da.pred(X)
-	printAccuracy(Y_PRED,Y,"Diagonal Linear Discriminant Analysis")
-except:
-	print "Error in DLDA"
-
-try:
-	gl = mlpy.Golub()
-	gl.learn(X,Y)
-	Y_PRED = gl.pred(X)
-	printAccuracy(Y_PRED,Y,"Golub Classifier")
-except:
-	"Error in Golub"
 
 
 
