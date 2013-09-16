@@ -46,7 +46,7 @@ def parseDataPoints(directory,regexParse):
 #Data is the data which is returned from parseDataPoints
 
 def packageData(fullData,regexParse,vocab, indexToWord):
-	X = [ [0 for z in range(len(vocab) + 1)   ] for j in range(len(fullData))]
+	X = [ [1 for z in range(len(vocab) + 1)   ] for j in range(len(fullData))]
 	Y = []
 	count = 0
 	for data in fullData:
@@ -71,14 +71,13 @@ def printAccuracy(pred_labels, actual_label, model_type):
 		if a == b:
 			accuracy+=1
 	accuracy/=len(Y)
-	print "With model", model_type, ", the accuracy is: ", accuracy*100, "%"
+	print "With model type,", model_type, ", the accuracy is: ", accuracy*100, "%"
 
 
 
 
 directory = raw_input("What directory are the XML files located:\n")
 regexParse = raw_input("How would you like to parse the words, leave it blank if you would like to parse by whitespace:\n")
-model_type = "LDAC"
 if(regexParse == ""):
 	regexParse = None
 [vocab,indexToWord,fullDataPoints] = parseDataPoints(directory,regexParse)
@@ -87,17 +86,56 @@ if(regexParse == ""):
 #for x in X:
 #	print len(x)
 
-print X[0], fullDataPoints[0][3]
-
-X = np.array(X)
-Y = np.array(Y)
-
-ldac = mlpy.LDAC()
-ldac.learn(X,Y)
-Y_PRED = ldac.predict(X)
+#print X[0], fullDataPoints[0][3]
+#print len(X),len(Y)
+#for x in X:
+#	print len(x)
 
 
-printAccuracy(Y_PRED, Y, model_type)
+try:
+	p = mlpy.Perceptron(alpha=0.1, thr=0.05, maxiters=1000)
+	p.learn(X,Y)
+	Y_PRED = p.pred(X)
+	printAccuracy(Y_PRED, Y, "Basic Perceptron")
+except: 
+	print "Error in BP"
+
+
+try:
+	en = mlpy.ElasticNetC(lmb=0.01, eps=0.001)
+	en.learn(X, Y)
+	Y_PRED = en.pred(X)
+	printAccuracy(Y_PRED,Y,"Elastic Net Classifer")
+except:
+	print "Error in ENC"
+
+
+
+try:
+	svm = mlpy.LibLinear(solver_type='l2r_l2loss_svc_dual', C=1)
+	svm.learn(X,Y)
+	Y_PRED = svm.pred(X)
+	printAccuracy(Y_PRED,Y,"Support Vector Machine")
+except:
+	print "Error in SVM"
+
+try:
+	da = mlpy.DLDA(delta=0.1)
+	da.learn(X, Y)
+	Y_PRED = da.pred(X)
+	printAccuracy(Y_PRED,Y,"Diagonal Linear Discriminant Analysis")
+except:
+	print "Error in DLDA"
+
+try:
+	gl = mlpy.Golub()
+	gl.learn(X,Y)
+	Y_PRED = gl.pred(X)
+	printAccuracy(Y_PRED,Y,"Golub Classifier")
+except:
+	"Error in Golub"
+
+
 
 
 
