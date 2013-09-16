@@ -269,12 +269,7 @@ if(regexParse == ""):
 	regexParse = None
 
 #Build the dictionaries and populate the datapoints
-data = parseDataPoints(directory, regexParse)
-
-#Unbox datapoints
-vocab = data[0]
-indexToWord = data[1]
-fullDataPoints = data[2]
+[vocab,indexToWord,fullDataPoints] = parseDataPoints(directory, regexParse)
 total = len(fullDataPoints)
 
 
