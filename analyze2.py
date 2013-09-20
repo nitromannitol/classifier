@@ -81,16 +81,23 @@ def divide(X,Y, divideMarker):
 	return X[:divide], X[divide:], Y[:divide], Y[divide:]
 
 
+#Print the stats associated with a model
+def printStats(yPred, yTest, modelName):
+	printAccuracy(yPred,yTest, modelName)
+	productBugs = float(sum(yTest))/len(yTest)
+	print modelName, "predicts", productBugs*100 , " % product bugs and", (1-productBugs)*100, "% automation bugs"
+
+
 
 #Tests the model without bias
 def testModel(model, X, Y, modelName):
 	[xTrain, xTest, yTrain, yTest] = divide(X, Y, 0.1)
 	try:
 		model.learn(xTrain, yTrain)
-		printAccuracy(model.pred(xTest),yTest, modelName)
+		printStats(model.pred(xTest),yTest,modelName)
+		##To do: model predicted XX% automation error XX% classifer error
 	except:
 		print "Error in", modelName
-
 
 
 
