@@ -38,7 +38,3 @@ whitespace), and, for `analyze.py`, how many random test subsets to average over
 python2 analyze.py
 python2 analyze2.py
 ```
-
-## Authors and citation
-
-The code is by **Ahmed Bou-Rabee**.
