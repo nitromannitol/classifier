@@ -11,7 +11,7 @@ prompt.
 
 - [`analyze.py`](analyze.py) is a Gaussian naive Bayes classifier written from scratch. It
   trains on all the files and reports the accuracy averaged over randomly chosen test subsets
-  of the same data. An accuracy of about 60% was reported for it on the author's data.
+  of the same data.
 - [`analyze2.py`](analyze2.py) trains the models of the `mlpy` library on the first tenth of
   the samples and reports their accuracy on the rest: perceptron, elastic net, LibLinear
   support vector machine, DLDA, Golub, Parzen, k-nearest neighbours (`k = 2`), classification
@@ -20,8 +20,6 @@ prompt.
   > D. Albanese, R. Visintainer, S. Merler, S. Riccadonna, G. Jurman, C. Furlanello,
   > *mlpy: Machine Learning Python*, 2012;
   > [arXiv:1202.6548](https://arxiv.org/abs/1202.6548).
-
-The XML input directory (the "tags" directory) is not part of this repository.
 
 ## Running
 
@@ -43,8 +41,7 @@ python2 analyze2.py
 
 ## Authors and citation
 
-The code is by **Ahmed Bou-Rabee**. There is no associated paper, so the repository has no
-`CITATION.cff`.
+The code is by **Ahmed Bou-Rabee**.
 
 ## License
 
